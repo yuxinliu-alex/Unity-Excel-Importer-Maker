@@ -9,6 +9,8 @@ using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Collections.Generic;
 using System.Text;
+using NPOI.OpenXmlFormats.Wordprocessing;
+using NPOI.SS.Formula.Functions;
 
 public class ExcelImporterMaker : EditorWindow
 {
@@ -17,11 +19,12 @@ public class ExcelImporterMaker : EditorWindow
     void OnGUI()
     {
         GUILayout.Label("makeing importer", EditorStyles.boldLabel);
+        sheetIndex = EditorGUILayout.Popup(sheetIndex,sheetNameList.ToArray());
         className = EditorGUILayout.TextField("class name", className);
         sepalateSheet = EditorGUILayout.Toggle("sepalate sheet", sepalateSheet);
-
+        
         EditorPrefs.SetBool(s_key_prefix + fileName + ".separateSheet", sepalateSheet);
-
+        
         if (GUILayout.Button("create"))
         {
             EditorPrefs.SetString(s_key_prefix + fileName + ".className", className);
@@ -34,7 +37,7 @@ public class ExcelImporterMaker : EditorWindow
         }
 
         // selecting sheets
-
+        
         EditorGUILayout.LabelField("sheet settings");
         EditorGUILayout.BeginVertical("box");
         foreach (ExcelSheetParameter sheet in sheetList)
@@ -92,6 +95,8 @@ public class ExcelImporterMaker : EditorWindow
     private bool sepalateSheet = false;
     private List<ExcelRowParameter> typeList = new List<ExcelRowParameter>();
     private List<ExcelSheetParameter> sheetList = new List<ExcelSheetParameter>();
+    private List<string> sheetNameList = new List<string>();
+    private int sheetIndex = 0;
     private string className = string.Empty;
     private string fileName = string.Empty;
     private static string s_key_prefix = "terasurware.exel-importer-maker.";
@@ -124,6 +129,7 @@ public class ExcelImporterMaker : EditorWindow
                     sht.sheetName = s.SheetName;
                     sht.isEnable = EditorPrefs.GetBool(s_key_prefix + window.fileName + ".sheet." + sht.sheetName, true);
                     window.sheetList.Add(sht);
+                    window.sheetNameList.Add(sht.sheetName);
                 }
 			
                 ISheet sheet = book.GetSheetAt(0);
